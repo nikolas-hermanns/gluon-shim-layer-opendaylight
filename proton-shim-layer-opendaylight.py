@@ -44,9 +44,9 @@ from threading import Thread
 
 etcd_client = None
 
-valid_host_ids = ('node-24.opnfvericsson.ca')
+valid_host_ids = ('node-4.domain.tld')
 
-proton_etcd_dir = '/net-l3vpn/proton'
+proton_etcd_dir = '/proton/net-l3vpn'
 
 def initialize_worker_thread(messages_queue):
     worker = Thread(target=process_queue, args=(messages_queue,))

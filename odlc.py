@@ -13,7 +13,7 @@ import json
 import ConfigParser
 from utils.log import LOG, log_enter_exit, for_all_methods
 
-ODL_IP = '10.118.101.142'
+ODL_IP = '192.168.0.21'
 ODL_PORT = '8080'
 ODL_PASSWORD = 'admin'
 ODL_USERNAME = 'admin'
@@ -195,15 +195,17 @@ class RestConfClient(ODL_CLient):
         except Exception:
             pass
         method = 'put'
-        if not obj_full_struct:
+        if not obj_full_struct or not obj_full_struct[path_plural].get(path):
             method = 'post'
-            obj_full_struct = {path_plural: {'path': []}}
+            obj_full_struct = {path_plural: {path: []}}
         objects = obj_full_struct[path_plural][path]
         index = self.key_value_is_in_dicts(objects, key, obj[key])
         if index:
             objects[index] = obj
         else:
             objects.append(obj)
+        if method == 'post':
+            obj_full_struct=obj_full_struct[path_plural]
         self.sendjson(method, url,
                       obj=obj_full_struct)
 
