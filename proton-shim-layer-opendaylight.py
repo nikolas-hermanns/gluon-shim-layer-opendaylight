@@ -65,10 +65,26 @@ def process_base_port_port(message, uuid):
         id = name=message_value['id']
         # TODO get this from nova somehow
         parent_interface = 'tap%s' % id[:11]
+        vif_dict = {'vif_type': 'ovs',
+                    'vif_details': {'port_filter': False}}
+        update_etcd_bound(id, vif_dict)
         odlc.update_ietf_interface(name=message_value['id'],
                                    parent_interface=parent_interface)
+
     elif action == 'delete':
         odlc.delete_ietf_interface(name=uudi)
+
+
+def update_etcd_bound(key, vif_dict):
+    vif_dict["controller"] = 'net-l3vpn'
+    etcd_key = "{0:s}/{1:s}/{2:s}/{3:s}".format("controller",
+                                                'net-l3vpn',
+                                                "ProtonBasePort", key)
+    try:
+        global etcd_client
+        etcd_client.write(etcd_key, json.dumps(vif_dict))
+    except Exception, e:
+        LOG.error("Update etcd to bound failed: %s" % str(e))
 
 def process_vpn_instance(message, uuid):
     action = message.action
